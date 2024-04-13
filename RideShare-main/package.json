@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "axios": "^1.6.7",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "ejs": "^1.0.0",
+    "web3": "^4.7.0"
+  },
+  "name": "decentralweb",
+  "description": "Default project for Truffle: example contracts, migrations and tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Siddharth",
+  "license": "ISC"
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    form {
+      margin-top: 30px;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create a Rideshare</h1>
+  <form action="/driver/create-ride" method="post">
+    <label for="name">Wallet Address:</label><br>
+    <input type="text" id="name" name="name" value="<%= wallet %>" disabled><br>
+    <label for="amount">Amount (ETH):</label><br>
+    <input type="number" id="amount" name="amount" required><br>
+    <label for="start">Trip Starting Location:</label><br>
+    <input type="text" id="start" name="start" required><br>
+    <label for="destination">Trip Destination:</label><br>
+    <input type="text" id="destination" name="destination" required><br>
+    <input type="submit" value="Start Ride" class="button">
+  </form>
+</body>
+</html>

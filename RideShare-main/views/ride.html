@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .ride-info {
+      background-color: #f2f2f2;
+      padding: 20px;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .ride-status {
+      margin: 0;
+    }
+
+    .current-time {
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .ride-info-text {
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .ride-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .ride-button:hover {
+      background-color: #45a049;
+    }
+    
+    body {
+        background-image: url("/bg.png");
+        background-color: #cccccc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ride-info">
+    <h2 class="ride-status", id="status"></h2>
+    <p class="current-time">Current Time: <span id="current-time">Sunday, April 7, 2024 10:30 AM</span></p>
+    <p class="ride-info-text">Time Elapsed: <span id="time-elapsed">00:00:00</span></p>
+    <p class="ride-info-text">Driver Wallet Address: <span><%= driver %></span></p>
+    <p class="ride-info-text">Rider Wallet Address: <span id ="rider"><%= rider %></span></p>
+    <p class="ride-info-text">Trip Amount: <span><%= amount %></span> ETH</p>
+    <img
+      src="https://images.squarespace-cdn.com/content/v1/529fb134e4b0dbf53fa8fa91/1519937527346-JLB1VYUKZXBCOEDDZIDG/05_.gif"
+      style="width:40%">
+    <p class="ride-info-text">Trip Start: <span><%= start %></span></p>
+    <p class="ride-info-text">Trip Destination: <span><%= destination %></span></p>
+    <button class="ride-button" id="ride-button" onclick="controlRide()"></button>
+  </div>
+</body>
+<script>
+    let rideStarted = '<%= rideStarted %>' == 'true' ? true : false;
+    let rideFinished = '<%= rideFinished %>' == 'true' ? true : false;
+    const isDriver = '<%= isDriver %>' == 'true' ? true : false;
+    let startTime;
+    
+    function init() {
+    if (isDriver && !rideStarted) {
+      document.getElementById('ride-button').textContent = 'Start Ride';
+    } else if (!isDriver && !rideStarted) {
+      document.getElementById('ride-button').textContent = 'Waiting for Driver';
+    } else {
+      document.getElementById('ride-button').textContent = 'Finish Ride';
+    }
+    if (rideStarted) {
+      document.getElementById('status').innerHTML = 'Ride Status: Ride Started';
+    } 
+    if (rideFinished) {
+      document.getElementById('status').innerHTML = 'Ride Status: Ride Finished';
+    } 
+    if (!rideStarted && !rideFinished){
+      document.getElementById('status').innerHTML = 'Ride Status: Ride Not Started';
+    }
+    
+    if (rideStarted && !startTime) {
+      startTime = new Date();
+    }
+    }
+
+    function controlRide(){
+      if (isDriver && !rideStarted) {
+        fetch('/driver/start-ride', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contractAddress: '<%= contractAddress %>',
+          }),
+        }).then((res=>res.json())).then((data)=>{
+          rideStarted = data.rideStarted;
+          init();
+        }).catch((err)=>console.log({err}));
+      } else if (rideStarted) {
+        fetch('/finish-ride', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contractAddress: '<%= contractAddress %>',
+          }),
+        }).then((res=>res.json())).then((data)=>{
+          rideFinished = data.rideFinished;
+          if (rideFinished){
+            window.location.href = '/'
+          }
+        }).catch((err)=>console.log({err}));
+      }
+    }
+    function updateTime() {
+      const currentTime = new Date();
+      const currentTimeString = currentTime.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('current-time').textContent = currentTimeString;
+
+      if (rideStarted && !rideFinished && startTime) {
+        const timeDiff = currentTime - startTime;
+        const seconds = Math.floor(timeDiff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const remainingSeconds = seconds % 60;
+        const remainingMinutes = minutes % 60;
+
+        const hoursString = hours < 10 ? '0' + hours : hours;
+        const remainingMinutesString = remainingMinutes < 10 ? '0' + remainingMinutes : remainingMinutes;
+        const remainingSecondsString = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+        document.getElementById('time-elapsed').textContent = `${hoursString}:${remainingMinutesString}:${remainingSecondsString}`;
+      }
+    }
+    function updateRideStatus(){
+      fetch('/ride-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contractAddress: '<%= contractAddress %>',
+        }),
+      }).then((res=>res.json()))
+      .then((data)=>{
+        rideStarted = data.rideStarted;
+        rideFinished = data.rideFinished;
+        document.getElementById('rider').textContent = data.rider;
+        init();
+      }).catch((err)=>{
+        console.log({err});
+        clearInterval(e);
+    });
+    }
+    init();
+    setInterval(updateTime, 1000);
+    const e = setInterval(updateRideStatus, 1000);
+</script>
+
+</html>

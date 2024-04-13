@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideShare</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f5f5f5;
+        padding: 2rem;
+    }
+
+    #rideshare-form {
+        width: 300px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 0.5rem;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    body {
+        background-image: url("/bg.png");
+        background-color: #cccccc;
+    }
+</style>
+
+<body>
+
+    <form id="rideshare-form">
+        <h1>Welcome to RideShare</h1>
+        <label for="wallet">Wallet Address:</label>
+        <input type="text" id="wallet" name="wallet" required>
+
+        <button type="button" id="driver">Driver</button>
+        <button type="button" id="passenger">Passenger</button>
+    </form>
+</body>
+<script>
+    const d = new Date();
+    d.setTime(d.getTime() + (90 * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    const cookie = document.cookie.split("; ").find((row) => row.startsWith("wallet="))?.split("=")[1];
+    if (cookie) {
+        document.getElementById("wallet").value = cookie;
+    }
+
+    document.getElementById('driver').addEventListener('click', function () {
+        const wallet = document.getElementById('wallet').value.trim();
+
+        if (wallet) {
+            document.cookie = `wallet=${wallet}; ${expires}`;
+            window.location.href = '/driver'
+        } else {
+            alert('Please enter a wallet address');
+        }
+    });
+
+    document.getElementById('passenger').addEventListener('click', function () {
+        const wallet = document.getElementById('wallet').value.trim();
+        document.cookie = "=John Doe";
+
+        if (wallet) {
+            document.cookie = `wallet=${wallet}; ${expires}`;
+            window.location.href = '/passenger'
+        } else {
+            alert('Please enter a wallet address');
+        }
+    });
+</script>
+
+</html>

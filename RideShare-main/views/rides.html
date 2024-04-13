@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .drives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.drive-item {
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 5px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drive-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.driver-name {
+  margin: 0;
+}
+
+.amount {
+  margin: 0;
+}
+.start-location {
+  margin: 0;
+}
+
+.destination {
+  margin: 0;
+}
+
+label {
+      display: block;
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    body {
+        background-image: url("/bg.png");
+        background-color: #cccccc;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Avaliable Rideshares:</h1>
+  <label for="name">Wallet Address:</label><br>
+  <input type="text" id="name" name="name" value="<%= wallet %>" readonly><br><br>
+  <div class="drives-list">
+  <% for (let i = 0; i < rideContracts.length; i++) { %>
+  <div class="drive-item">
+    <div class="drive-info">
+      <h3 class="driver-name">Driver: <%= rideContracts[i].driver %></h3>
+      <p class="amount">Amount: <%= rideContracts[i].amount %> ETH</p>
+      <p class="start-location">Start: <%= rideContracts[i].start %></p>
+      <p class="destination">Destination: <%= rideContracts[i].destination %></p>
+    </div>
+    <button class="button" onclick="acceptRide('<%= rideContracts[i].contractAddress %>')">Pay <%= rideContracts[i].amount %> ETH</button>
+  </div>
+  <% } %>
+</div>
+</body>
+<script>
+function acceptRide(contractAddress){
+  fetch('/passenger/accept-ride', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ contractAddress })
+  })
+  .then((res)=>res.json())
+  .then((data)=>{
+    if(data.contractAddress){
+      window.location.href = `/ride/${data.contractAddress}`
+    } else {
+      alert('Cannot accept ride. Check Funds and try again.');
+      location.reload();
+    }
+  })
+  .catch((err)=>{
+    console.log(err)
+  })
+}
+</script>
+</html>
